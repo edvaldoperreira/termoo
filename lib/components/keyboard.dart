@@ -7,12 +7,33 @@ class Keyboard extends StatelessWidget {
   final String keyboard2 = "ASDFGHJKL";
   final String keyboard3 = "ZXCVBNM";
 
+  const Keyboard({Key? key}) : super(key: key);
+
   Color getColorKey(Word word, String key) {
     var color = Colors.black54;
-    if (word.blueLetters.containsValue(key)) {
-      color = Color.fromARGB(255, 29, 229, 240);
-    } else if (word.yellowLetters.containsValue(key)) {
-      color = Color.fromARGB(255, 255, 165, 46);
+
+    bool blue = false;
+    for (var element in word.blueLetters.values) {
+      if (element.values.contains(key)) {
+        blue = true;
+        break;
+      }
+    }
+
+    bool yellow = false;
+    for (var element in word.yellowLetters.values) {
+      if (element.values.contains(key)) {
+        yellow = true;
+        break;
+      }
+    }
+
+    if (blue) {
+      color = Colors.teal;
+    } else if (yellow) {
+      color = Colors.orangeAccent.shade700;
+    } else if (word.wrongLetters.contains(key)) {
+      color = Colors.black26;
     }
     return color;
   }
@@ -27,9 +48,9 @@ class Keyboard extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Padding(
-              padding: const EdgeInsets.all(1),
+              padding: const EdgeInsets.all(2),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+                padding: EdgeInsets.all(MediaQuery.of(ctx).size.width / 55),
                 color: getColorKey(wordProvider, key),
                 child: Text(
                   key,
