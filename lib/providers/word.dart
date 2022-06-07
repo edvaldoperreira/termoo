@@ -1,23 +1,35 @@
+import 'dart:ffi';
 import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
-
+import 'package:flutter/material.dart';
 import '../data/dummy_data.dart';
 
 class Word with ChangeNotifier {
-  static String _wordDay = words[Random().nextInt(words.length)];
-  Map<int, String> boardWords = {};
-  List<String> typedWords = ["", "", "", "", "", ""];
-  List<String> trueKeys = [];
-  List<String> typedWordsEnter = [];
-  List<bool> showAwnser = [false, false, false, false, false, false];
-  int currentPosition = 1;
-  int currentLine = 1;
+  String _wordDay = "ENTER"; //words[Random().nextInt(words.length)];
+  int maxLetters = 5;
   int maxLine = 6;
-  int maxPosition = 5;
-  bool win = false;
-  bool done = false;
-  String messageWin = "";
+  int currentLine = 1;
+  int currentPosition = 1;
+  Map<int, String> blueLetters = {};
+  Map<int, String> yellowLetters = {};
+
+  final Map<int, String> wordsBoard = {
+    1: "",
+    2: "",
+    3: "",
+    4: "",
+    5: "",
+    6: "",
+  };
+
+  final Map<int, Map<String, List<dynamic>>> wordsBoard2 = {
+    1: {"": []},
+    2: {"": []},
+    3: {"": []},
+    4: {"": []},
+    5: {"": []},
+    6: {"": []},
+  };
 
   String get wordDay {
     return removeDiacritics(_wordDay);
@@ -27,88 +39,124 @@ class Word with ChangeNotifier {
     return _wordDay;
   }
 
-  void startGame() {
-    _wordDay = words[Random().nextInt(words.length)];
-    typedWords = ["", "", "", "", "", ""];
-    typedWordsEnter.clear();
-    trueKeys.clear();
-    showAwnser = [false, false, false, false, false, false];
-    currentPosition = 1;
-    currentLine = 1;
-    maxLine = 6;
-    maxPosition = 5;
-    win = false;
-    done = false;
-    messageWin = "";
+  writeLetter(String key) {
+    if (key == "DEL") {
+      wordsBoard.update(currentLine, (value) {
+        return value.isNotEmpty ? value.substring(0, value.length - 1) : value;
+      });
+    } else if (key == "ENTER") {
+      colorLetters();
+      checkResult();
+      if (currentLine < maxLine) {
+        currentLine++;
+        currentPosition = 1;
+      }
+    } else if (key != "") {
+      wordsBoard.update(currentLine, (value) {
+        return value.length < maxLetters ? value += key : value;
+      });
+
+      wordsBoard2.update(currentLine, (oldValue) {
+        var updatedWord = oldValue.keys.first;
+        return {updatedWord += key: oldValue.values.first};
+      });
+    }
+    print(wordsBoard2[currentLine]);
     notifyListeners();
   }
 
-  void keyPressed(String key) {
-    if (key == "ENTER") {
-      if (currentPosition > maxPosition &&
-          typedWords[currentLine - 1].length == 5) {
-        boardWords.putIfAbsent(currentLine, () => typedWords[currentLine - 1]);
-        showAwnser[currentLine - 1] = true;
-        typedWordsEnter.add(typedWords[currentLine - 1]);
-        checkResult();
-        if (!win) {
-          currentPosition = 1;
-          currentLine++;
+  colorLetters() {
+    Map<String, int> qtLetter = {};
+
+    for (var i = 0; i < wordDay.length; i++) {
+      var letter = wordDay[i];
+      int count = 0;
+      for (var j = 0; j < wordDay.length; j++) {
+        if (letter == wordDay[j]) {
+          count++;
         }
       }
-      if (currentLine > maxLine) {
-        done = true;
-      }
-    } else if (key == "DEL" && !win) {
-      if (currentPosition > 1) {
-        typedWords[currentLine - 1] = typedWords[currentLine - 1]
-            .substring(0, typedWords[currentLine - 1].length - 1);
-        backPosition();
-      }
-    } else {
-      if (currentPosition <= maxPosition && !win) {
-        typedWords[currentLine - 1] += key.toUpperCase();
-        nextPosition();
+      qtLetter.addEntries([MapEntry(letter, count)]);
+    }
+
+    //print(qtLetter);
+
+    var wordBoard = wordsBoard2[currentLine]?.keys.first as String;
+
+    for (var i = 0; i < wordBoard.length; i++) {
+      var letter = wordBoard[i];
+      int countLetter = qtLetter[letter] ?? 0;
+
+      if (wordBoard[i] == wordDay[i] && countLetter > 0) {
+        //addBlueLetter(i, letter);
+        wordsBoard2.update(currentLine, (oldValue) {
+          var colors = oldValue.values.first;
+          colors.add(Color.fromARGB(255, 29, 229, 240));
+          return {oldValue.keys.first: colors};
+        });
+        qtLetter.update(letter, (value) => value = value - 1);
+      } else if (wordDay.contains(wordBoard[i]) && countLetter > 0) {
+        wordsBoard2.update(currentLine, (oldValue) {
+          var colors = oldValue.values.first;
+          colors.add(Color.fromARGB(255, 255, 165, 46));
+          return {oldValue.keys.first: colors};
+        });
+        qtLetter.update(letter, (value) => value = value - 1);
+      } else {
+        wordsBoard2.update(currentLine, (oldValue) {
+          var colors = oldValue.values.first;
+          colors.add(Colors.black54);
+          return {oldValue.keys.first: colors};
+        });
       }
     }
-    // print(boardWords);
-    notifyListeners();
+
+    // for (var i = 0; i < wordBoard.length; i++) {
+    //   var letter = wordBoard[i];
+    //   int countLetter = qtLetter[letter] ?? 0;
+    //   if (blueLetters[i] != letter) {
+    //     if (wordDay.contains(wordBoard[i]) && countLetter > 0) {
+    //       addYellowLetter(i, letter);
+    //       qtLetter.update(letter, (value) => value = value - 1);
+    //     }
+    //   }
+    // }
+
+    print(qtLetter);
+    print(blueLetters);
+    print(yellowLetters);
+
+    //wordsBoard.forEach((key, value) {
+    // if (key == currentLine) {
+    //   for (var i = 0; i < value.length; i++) {
+    //     int countKey = value[i].allMatches(_wordDay).length;
+    //     if (value[i] == _wordDay[i] && countKey > 0) {
+    //       blueLetters.add(value[i]);
+    //       countKey--;
+    //    }
+    //     if (_wordDay.contains(value[i]) && countKey > 0) {
+    //      yellowLetters.add(value[i]);
+    //      countKey--;
+    //    }
+    //  }
+    // }
+    //});
   }
 
-  void checkResult() {
-    if (typedWords[currentLine - 1] == wordDay) {
-      win = true;
-      if (currentLine == 1) {
-        messageWin = "Inacreditável!";
-      }
-      if (currentLine == 2) {
-        messageWin = "Impressionante!";
-      }
-      if (currentLine == 3) {
-        messageWin = "Incrível!";
-      }
-      if (currentLine == 4) {
-        messageWin = "Ual!";
-      }
-      if (currentLine == 5) {
-        messageWin = "Ufa!";
-      }
-      if (currentLine == 6) {
-        messageWin = "Ufa";
-      }
-    }
+  checkResult() {}
+
+  void startGame() {
+    _wordDay = words[Random().nextInt(words.length)];
+    blueLetters.clear();
+    yellowLetters.clear();
   }
 
-  void backPosition() {
-    if (currentPosition >= 0) {
-      currentPosition--;
-    }
+  addBlueLetter(int position, String letter) {
+    blueLetters.addEntries([MapEntry(position, letter)]);
   }
 
-  void nextPosition() {
-    if (currentPosition <= maxPosition) {
-      currentPosition++;
-    }
+  addYellowLetter(int position, String letter) {
+    yellowLetters.addEntries([MapEntry(position, letter)]);
   }
 
   String removeDiacritics(String str) {
@@ -122,33 +170,5 @@ class Word with ChangeNotifier {
     }
 
     return str.toUpperCase();
-  }
-
-  bool isRightPosition(int line, int index) {
-    if (wordDay[index] == typedWords[line][index]) {
-      if (!trueKeys.contains(typedWords[line][index])) {
-        trueKeys.add(typedWords[line][index]);
-      }
-      return true;
-    }
-    return false;
-  }
-
-  bool isKeyInRightPosition(String key) {
-    return wordDay[currentPosition - 2] == key;
-  }
-
-  bool isKeyContains(String key) {
-    return wordDay[currentPosition - 2].contains(key);
-  }
-
-  bool isExists(int line, int index) {
-    // print(wordDay);
-    // print(typedWords[line][index]);
-    // print(trueKeys);
-    if (wordDay.contains(typedWords[line][index])) {
-      return true;
-    }
-    return false;
   }
 }

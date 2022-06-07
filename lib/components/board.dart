@@ -1,75 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:termoo/components/line.dart';
+import 'package:termoo/providers/word.dart';
 
 class Board extends StatelessWidget {
-  const Board({Key? key}) : super(key: key);
-
-  static Map<String, List<Widget>> itemsMap = {};
-
-  startBoard() {
-    getPositions(5, 0);
-    getPositions(5, 1);
-    getPositions(5, 2);
-    getPositions(5, 3);
-    getPositions(5, 4);
-    getPositions(5, 5);
-  }
-
-  List<Widget> getRows(int quantity) {
-    List<Widget> rows = [];
-    for (var i = 0; i < quantity; i++) {
-      rows.add(Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: itemsMap[i.toString()]!.toList(),
-      ));
-      rows.add(const Spacer());
+  Color getColorBoard(Word word, int position, String key) {
+    var color = Colors.black54;
+    if (word.blueLetters[position] == key) {
+      color = Color.fromARGB(255, 29, 229, 240);
+    } else if (word.yellowLetters[position] == key) {
+      color = Color.fromARGB(255, 255, 165, 46);
     }
-    return rows;
+    return color;
   }
 
-  // if (word.isRightPosition(line, index)) {
-  //       colorContainer = const Color.fromARGB(255, 41, 192, 192);
-  //     } else if (word.isExists(line, index) && (qtKeyAux == qtKey)) {
-  //       colorContainer = const Color.fromARGB(255, 245, 176, 72);
-  //     }
-
-  void getPositions(int quantity, int line) {
+  List<Widget> getLines(int quantity, int line, BuildContext ctx) {
+    final Word provider = Provider.of<Word>(ctx);
+    final String wordLine = provider.wordsBoard[line + 1] as String;
     List<Widget> items = [];
+
     for (var i = 0; i < quantity; i++) {
-      items.add(
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            height: 60,
-            width: 60,
-            color: Colors.black54,
-            child: Center(
-              child: Text(
-                "",
-                style: const TextStyle(
-                  fontSize: 50,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
+      var text = wordLine.length > i ? wordLine[i] : "";
+      //var color = getColorBoard(provider, i, text);
+      var colors = provider.wordsBoard2[line + 1]?.values.first;
+      print(colors);
+      var selectedColor = Colors.black54;
+
+      if (colors != null && colors.length > i) {
+        selectedColor = colors[i] ?? Colors.black54;
+      }
+
+      items.add(Line(
+        text,
+        selectedColor,
+      ));
     }
-    itemsMap.putIfAbsent(line.toString(), () => items);
+    return items;
   }
 
   @override
   Widget build(BuildContext context) {
-    startBoard();
     return Container(
         margin: const EdgeInsets.only(top: 20),
         alignment: Alignment.center,
-        height: 420,
+        height: 350,
         padding: const EdgeInsets.all(15),
         width: double.infinity,
-        child: Column(
-          children: getRows(6),
-        ));
+        child: Column(children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: getLines(5, 0, context),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: getLines(5, 1, context),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: getLines(5, 2, context),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: getLines(5, 3, context),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: getLines(5, 4, context),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: getLines(5, 5, context),
+          ),
+        ]));
   }
 }

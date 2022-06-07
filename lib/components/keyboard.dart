@@ -1,38 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:termoo/providers/word.dart';
 
-class Keyboard extends StatefulWidget {
-  String currentKey;
-
-  Keyboard(this.currentKey, {Key? key}) : super(key: key);
-
-  @override
-  State<Keyboard> createState() => _KeyboardState();
-}
-
-class _KeyboardState extends State<Keyboard> {
+class Keyboard extends StatelessWidget {
   final String keyboard1 = "QWERTYUIOP";
-
   final String keyboard2 = "ASDFGHJKL";
-
   final String keyboard3 = "ZXCVBNM";
 
+  Color getColorKey(Word word, String key) {
+    var color = Colors.black54;
+    if (word.blueLetters.containsValue(key)) {
+      color = Color.fromARGB(255, 29, 229, 240);
+    } else if (word.yellowLetters.containsValue(key)) {
+      color = Color.fromARGB(255, 255, 165, 46);
+    }
+    return color;
+  }
+
   Widget addTecla(BuildContext ctx, String key) {
+    final Word wordProvider = Provider.of<Word>(ctx);
+
     return Column(
       children: [
         GestureDetector(
-          onTap: () {
-            setState(() {
-              widget.currentKey = key;
-            });
-          },
+          onTap: () => wordProvider.writeLetter(key),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Padding(
-              padding: const EdgeInsets.all(2),
+              padding: const EdgeInsets.all(1),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                color: Colors.black54,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+                color: getColorKey(wordProvider, key),
                 child: Text(
                   key,
                   style: const TextStyle(
@@ -53,7 +51,6 @@ class _KeyboardState extends State<Keyboard> {
 
     for (var i = 0; i < letters.length; i++) {
       keyboard.add(addTecla(ctx, letters[i]));
-
       if (letters[i] == "L") {
         keyboard.add(addTecla(ctx, "DEL"));
       }
@@ -61,7 +58,6 @@ class _KeyboardState extends State<Keyboard> {
         keyboard.add(addTecla(ctx, "ENTER"));
       }
     }
-
     return keyboard;
   }
 
