@@ -48,35 +48,48 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final Word provider = Provider.of<Word>(context);
 
+    var appBar = AppBar(
+      title: Text(widget.title),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.skateboarding_rounded),
+          onPressed: () => provider.harModeSwitch(),
+        ),
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () => provider.startGame(),
+        ),
+      ],
+    );
+
+    final availableHeight = MediaQuery.of(context).size.height -
+        appBar.preferredSize.height -
+        MediaQuery.of(context).padding.top;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => provider.startGame(),
+      appBar: appBar,
+      body: Column(
+        children: [
+          SizedBox(
+            height: availableHeight * 0.60,
+            child: const Board(),
           ),
-        ],
-      ),
-      body: Container(
-        padding:
-            const EdgeInsets.only(top: 10, right: 10, left: 10, bottom: 20),
-        child: Column(
-          children: [
-            const Board(),
-            const Spacer(),
-            const EndGame(),
-            const Spacer(),
-            Center(
+          SizedBox(
+            height: availableHeight * 0.10,
+            child: const EndGame(),
+          ),
+          SizedBox(
+            height: availableHeight * 0.30,
+            child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Keyboard(),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

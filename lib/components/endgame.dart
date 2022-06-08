@@ -20,7 +20,7 @@ class EndGame extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               color: Theme.of(context).primaryColor,
               child: const Text(
-                "Congratulations, you won!",
+                "Parabéns! Você ganhou!",
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.white,
@@ -31,10 +31,6 @@ class EndGame extends StatelessWidget {
         if (provider.finalGame && !provider.victory)
           Row(
             children: [
-              const Icon(
-                Icons.sentiment_very_dissatisfied_outlined,
-                color: Colors.white,
-              ),
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Container(

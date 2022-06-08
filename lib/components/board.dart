@@ -44,8 +44,7 @@ class Board extends StatelessWidget {
     return Container(
         margin: const EdgeInsets.only(top: 10),
         alignment: Alignment.center,
-        height: 400,
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(20),
         width: double.infinity,
         child: Column(children: [
           Expanded(

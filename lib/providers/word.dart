@@ -13,6 +13,7 @@ class Word with ChangeNotifier {
   bool finalGame = false;
   bool victory = false;
   bool notValidWord = false;
+  bool hardMode = false;
   Map<int, Map<int, String>> blueLetters = {};
   Map<int, Map<int, String>> yellowLetters = {};
   List<String> wrongLetters = [];
@@ -25,6 +26,10 @@ class Word with ChangeNotifier {
 
   String get wordDayOriginal {
     return _wordDay;
+  }
+
+  harModeSwitch() {
+    hardMode = !hardMode;
   }
 
   setPosition(int line, int position) {

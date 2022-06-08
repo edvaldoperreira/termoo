@@ -52,7 +52,7 @@ class Keyboard extends StatelessWidget {
                 ? 70
                 : key == "ENTER"
                     ? 100
-                    : 36,
+                    : 34,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Padding(
@@ -86,8 +86,6 @@ class Keyboard extends StatelessWidget {
       if (letters[i] == "M") {
         keyboard.add(addTecla(ctx, "DEL"));
       }
-      //if (letters[i] == "M") {
-      //}
     }
     if (letters.isEmpty) keyboard.add(addTecla(ctx, "ENTER"));
     return keyboard;
