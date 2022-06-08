@@ -6,6 +6,7 @@ class Keyboard extends StatelessWidget {
   final String keyboard1 = "QWERTYUIOP";
   final String keyboard2 = "ASDFGHJKL";
   final String keyboard3 = "ZXCVBNM";
+  final String keyboard4 = "";
 
   const Keyboard({Key? key}) : super(key: key);
 
@@ -45,18 +46,28 @@ class Keyboard extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () => wordProvider.writeLetter(key),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Padding(
-              padding: const EdgeInsets.all(2),
-              child: Container(
-                padding: EdgeInsets.all(MediaQuery.of(ctx).size.width / 55),
-                color: getColorKey(wordProvider, key),
-                child: Text(
-                  key,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
+          child: SizedBox(
+            height: 50,
+            width: key == "DEL"
+                ? 70
+                : key == "ENTER"
+                    ? 100
+                    : 36,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Padding(
+                padding: const EdgeInsets.all(2),
+                child: Container(
+                  padding: EdgeInsets.all(MediaQuery.of(ctx).size.width / 55),
+                  color: getColorKey(wordProvider, key),
+                  child: Center(
+                    child: Text(
+                      key,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -72,13 +83,13 @@ class Keyboard extends StatelessWidget {
 
     for (var i = 0; i < letters.length; i++) {
       keyboard.add(addTecla(ctx, letters[i]));
-      if (letters[i] == "L") {
+      if (letters[i] == "M") {
         keyboard.add(addTecla(ctx, "DEL"));
       }
-      if (letters[i] == "M") {
-        keyboard.add(addTecla(ctx, "ENTER"));
-      }
+      //if (letters[i] == "M") {
+      //}
     }
+    if (letters.isEmpty) keyboard.add(addTecla(ctx, "ENTER"));
     return keyboard;
   }
 
@@ -94,6 +105,9 @@ class Keyboard extends StatelessWidget {
         ),
         Row(
           children: keyboard(context, keyboard3),
+        ),
+        Row(
+          children: keyboard(context, keyboard4),
         ),
       ],
     );

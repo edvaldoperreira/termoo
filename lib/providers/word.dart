@@ -5,7 +5,7 @@ import 'package:termoo/data/dictionary_data.dart';
 import '../data/words_data.dart';
 
 class Word with ChangeNotifier {
-  String _wordDay = "TERMO"; //words[Random().nextInt(words.length)];
+  String _wordDay = words[Random().nextInt(words.length)];
   int maxLetters = 5;
   int maxLine = 6;
   int currentLine = 1;
