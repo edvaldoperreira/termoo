@@ -391,6 +391,7 @@ const List<String> words = [
   "antro",
   "reger",
   "comer",
+  "comeu",
   "chuva",
   "prono",
   "plano",

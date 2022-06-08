@@ -4579,6 +4579,7 @@ const List<String> dictionary = [
   "chata",
   "chuva",
   "comer",
+  "comeu",
   "carro",
   "chulo",
   "campo",
